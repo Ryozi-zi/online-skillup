@@ -28,7 +28,7 @@ app.get('/time', (req, res) => {
   res.send(moment().format('YYYY/MM/DD HH:mm:ss'));
 });
 
-// メッセージを全て格納する配列chats
+// メッセージとユーザーネームをオブジェクトとして格納する配列chatLog
 const chatLog = [];
 
 // ログに入れる最大メッセージ数
@@ -50,7 +50,7 @@ const io = require('socket.io')(server, {
 io.on('connection', (socket) => {
   console.log('connected:', socket.id);
 
-  // chatsを送信する
+  // chatLogを送信する
   socket.on('getChatLog', function() {
     socket.emit('setChatLog', chatLog);
   });
@@ -61,15 +61,16 @@ io.on('connection', (socket) => {
   });
 
   // ユーザの参加
-  socket.on('send', (message) => {
-    // 受け取ったメッセージをchatLogにpush
+  socket.on('send', (message, userName) => {
+    // 受け取ったメッセージ、ユーザーネームをオブジェクトにしてchatLogにpush
     console.log('send:', message);
-    chatLog.push(message);
+    chatLog.push({ text: message, username: userName });
     // chatLogの長さが500件を超えた際に半分削る
     if (chatLog.length > maxMessage) {
       chatLog.splice(chatLog.length / 2, chatLog.length / 2);
       console.log('消してます');
     }
-    io.emit('send', message);
+    // メッセージ、ユーザーネームのオブジェクトを返す
+    io.emit('send', { text: message, username: userName });
   });
 });
