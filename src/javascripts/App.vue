@@ -5,16 +5,18 @@
     <span class="sample">サンプルコード</span>
   </p>
   <p style="color: red;" v-if="errorMessage">{{ errorMessage }}</p>
-  <MyComponent :message="$data.message" />
   <form @submit="onSubmit">
-    <input type="text" v-model="userName">
-    <input v-model="$data.text" type="text" required>
+    <label for="name">Username</label>
+    <input type="text" name="username" v-model="userName" placeholder="ユーザーネーム" required>
+    <label for="text">Posts</label>
+    <input v-model="$data.text" name="text" type="text" placeholder="投稿" required>
     <button type="submit">送信</button>
   </form>
-  <div v-html="identicon"></div>
-  <ul>
-    <li v-for="chat in chats">
-      {{ chat }}
+  <ul id="chats">
+    <li v-for="chat in chatLog">
+      <h2>{{ chat.username }}</h2>
+      <p> {{ chat.text }}</p>
+      <div v-html="identicon(chat.username)"></div>
     </li>
   </ul>
 </div>
@@ -34,9 +36,8 @@ export default {
   data() {
     return {
       userName: '',
-      message: '',
       text: '',
-      chats: [],
+      chatLog: [],
       errorMessage: ''
     };
   },
@@ -50,19 +51,14 @@ export default {
 
     socket.on('setChatLog', (messages) => {
       // サーバーからチャットの配列を受け取って追加
-      this.chats.push(...messages);
+      this.chatLog.push(...messages);
       console.log(messages);
     });
-
-    socket.on('send', (message) => {
-      // messageが空欄だった場合にエラーメッセージを表示
-      if (message) {
-        console.log(message);
-        this.$data.message = message;
-        this.chats.push(message);
-      } else {
-        this.errorMessage = '投稿内容を入力してください';
-      }
+    // 返ってきたメッセージとユーザーネームのobjectを自身のchatLogに代入
+    socket.on('send', (object) => {
+      console.log(object);
+      this.chatLog.push(object);
+      this.scroll();
     });
   },
   methods: {
@@ -71,20 +67,33 @@ export default {
      */
     onSubmit(e) {
       e.preventDefault();
-      socket.emit('send', this.$data.text);
+      // textとusernameが空かどうか判定する
+      if (this.text && this.$data.userName) {
+        socket.emit('send', this.$data.text, this.$data.userName);
+        this.errorMessage = '';
+      } else {
+        // messageが空欄だった場合にエラーメッセージを表示
+        this.errorMessage = '投稿内容、もしくはユーザーネームを入力してください';
+      }
       this.text = '';
-      this.errorMessage = '';
-    }
-  },
-  computed: {
-    identicon() {
-      return jdenticon.toSvg(this.userName, 200);
+    },
+    identicon: (username) => {
+      return jdenticon.toSvg(username, 50);
+    },
+
+    scroll() {
+      const childElement = document.getElementById('chats').lastChild;
+      childElement.scrollIntoView(false);
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+li {
+  list-style: none;
+}
+
 .logo {
   width: 40px;
 }
