@@ -58,7 +58,6 @@ export default {
     socket.on('send', (object) => {
       console.log(object);
       this.chatLog.push(object);
-      this.scroll();
     });
   },
   methods: {
@@ -77,13 +76,16 @@ export default {
       }
       this.text = '';
     },
+
     identicon: (username) => {
       return jdenticon.toSvg(username, 50);
     },
 
     scroll() {
       const childElement = document.getElementById('chats').lastChild;
-      childElement.scrollIntoView(false);
+      if (childElement) {
+        childElement.scrollIntoView(false);
+      }
     }
   }
 };
