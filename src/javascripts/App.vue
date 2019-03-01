@@ -12,26 +12,21 @@
     <input v-model="$data.text" name="text" type="text" placeholder="投稿" required>
     <button type="submit">送信</button>
   </form>
-  <ul id="chats">
-    <li v-for="chat in chatLog">
-      <h2>{{ chat.username }}</h2>
-      <p> {{ chat.text }}</p>
-      <div v-html="identicon(chat.username)"></div>
-    </li>
-  </ul>
+    <userPost :chatLog="chatLog"></userPost>
 </div>
 </template>
 
 <script>
 import socket from './utils/socket';
-const jdenticon = require('jdenticon');
 
 // components
 import MyComponent from './components/MyComponent.vue';
+import userPost from './components/userPost.vue';
 
 export default {
   components: {
-    MyComponent
+    MyComponent,
+    userPost
   },
   data() {
     return {
@@ -77,10 +72,6 @@ export default {
       this.text = '';
     },
 
-    identicon: (username) => {
-      return jdenticon.toSvg(username, 50);
-    },
-
     scroll() {
       const childElement = document.getElementById('chats').lastChild;
       if (childElement) {
@@ -92,10 +83,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-li {
-  list-style: none;
-}
-
 .logo {
   width: 40px;
 }
