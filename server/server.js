@@ -34,6 +34,9 @@ const chatLog = [];
 // ログに入れる最大メッセージ数
 const maxMessage = 500;
 
+// ログのid
+let logId = 0;
+
 // サーバーを起動する
 const server = app.listen(process.env.PORT || 4000, '0.0.0.0', () => {
   const host = server.address().address;
@@ -63,14 +66,15 @@ io.on('connection', (socket) => {
   // ユーザの参加
   socket.on('send', (message, userName) => {
     // 受け取ったメッセージ、ユーザーネームをオブジェクトにしてchatLogにpush
-    console.log('send:', message);
-    chatLog.push({ text: message, username: userName });
+    console.log('send:', message, 'at', moment().format('YYYY/MM/DD HH:mm:ss'));
+    logId++;
+    chatLog.push({ text: message, username: userName, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss') });
     // chatLogの長さが500件を超えた際に半分削る
     if (chatLog.length > maxMessage) {
       chatLog.splice(chatLog.length / 2, chatLog.length / 2);
       console.log('消してます');
     }
     // メッセージ、ユーザーネームのオブジェクトを返す
-    io.emit('send', { text: message, username: userName });
+    io.emit('send', { text: message, username: userName, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss') });
   });
 });
