@@ -58,6 +58,12 @@ io.on('connection', (socket) => {
     socket.emit('setChatLog', chatLog);
   });
 
+  // likeを更新する
+  socket.on('like', (likedLog, userName) => {
+    socket.broadcast.emit('onLikeSocket', likedLog);
+    console.log(userName + ' liked ' + likedLog.text);
+  });
+
   // 切断時
   socket.on('disconnect', () => {
     console.log('disconnected:', socket.id);
@@ -67,14 +73,14 @@ io.on('connection', (socket) => {
   socket.on('send', (message, userName) => {
     // 受け取ったメッセージ、ユーザーネームをオブジェクトにしてchatLogにpush
     console.log('send:', message, 'at', moment().format('YYYY/MM/DD HH:mm:ss'));
-    logId++;
-    chatLog.push({ text: message, username: userName, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss') });
+    chatLog.push({ username: userName, text: message, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss'), like: 0 });
     // chatLogの長さが500件を超えた際に半分削る
     if (chatLog.length > maxMessage) {
       chatLog.splice(chatLog.length / 2, chatLog.length / 2);
       console.log('消してます');
     }
     // メッセージ、ユーザーネームのオブジェクトを返す
-    io.emit('send', { text: message, username: userName, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss') });
+    io.emit('send', { username: userName, text: message, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss'), like: 0 });
+    logId++;
   });
 });

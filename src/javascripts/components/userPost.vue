@@ -7,6 +7,8 @@
           <p class="username">{{ chat.username }}</p>
           <p class="postedTime">{{ chat.postedTime }}</p>
           <p class="userpost" v-html="chat.text"></p>
+          <button @click="onLike(chat.id)">like</button>
+          <p>{{ chat.like }}</p>
         </div>
       </li>
     </transition-group>
@@ -23,12 +25,18 @@ export default {
   methods: {
     identicon: (username) => {
       return jdenticon.toSvg(username, 50);
+    },
+
+    onLike(id) {
+      this.$emit('onLike', id);
     }
   },
   updated() {
     // v-forがアップデートされた時にメッセージに合わせる
     const childList = document.getElementById('chats_list').lastChild;
-    childList.scrollIntoView(false);
+    if (childList) {
+      childList.scrollIntoView(false);
+    }
   }
 };
 </script>

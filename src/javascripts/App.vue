@@ -5,7 +5,7 @@
     <span class="sample">サンプルコード</span>
   </p>
   <p style="color: red;" v-if="errorMessage">{{ errorMessage }}</p>
-  <userPost :chatLog="chatLog" id="log"></userPost>
+  <userPost :chatLog="chatLog" id="log" @onLike="onLike"></userPost>
   <form @submit="onSubmit">
     <label for="name">Username</label>
     <input type="text" name="username" v-model="userName" placeholder="ユーザーネーム" required>
@@ -53,6 +53,10 @@ export default {
       console.log(object);
       this.chatLog.push(object);
     });
+
+    socket.on('onLikeSocket', (likedLog) => {
+      this.chatLog[likedLog.id].like = likedLog.like;
+    });
   },
   methods: {
     /**
@@ -71,6 +75,12 @@ export default {
         this.errorMessage = '投稿内容、もしくはユーザーネームを入力してください';
       }
       this.text = '';
+    },
+
+    onLike(id) {
+      this.chatLog[id].like++;
+      console.log(this.chatLog[id].like);
+      socket.emit('like', this.chatLog[id], this.userName);
     }
   }
 };
