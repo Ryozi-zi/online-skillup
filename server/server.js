@@ -61,6 +61,7 @@ io.on('connection', (socket) => {
   // likeを更新する
   socket.on('like', (likedLog, userName) => {
     socket.broadcast.emit('onLikeSocket', likedLog);
+    chatLog[likedLog.id].like = likedLog.like;
     console.log(userName + ' liked ' + likedLog.text);
   });
 
