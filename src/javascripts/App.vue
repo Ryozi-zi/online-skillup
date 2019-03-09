@@ -52,9 +52,8 @@ export default {
       const vm = this;
       // サーバーからチャットの配列を受け取って追加
       vm.chatLog.push(...messages);
-      vm.likedList = JSON.parse(localStorage.getItem(key));
       console.log(vm.likedList);
-      if (vm.likedList) {
+      if (!localStorage.getItem(key)) {
         vm.likedList.forEach(function(item) {
           if (vm.chatLog[item.id]) {
             vm.chatLog[item.id].isLiked = item.isLiked;
@@ -106,7 +105,7 @@ export default {
       if (vm.likedList.length > 0) {
         vm.likedList.forEach(function(item) {
           if (item.id === logId) {
-            vm.likedList[item.id].isLiked = vm.likedLog.isLiked;
+            item.isLiked = vm.likedLog.isLiked;
             isUpdated = true;
           }
         });
@@ -117,7 +116,7 @@ export default {
       }
       localStorage.setItem(key, JSON.stringify(vm.likedList));
       socket.emit('like', this.chatLog[logId], this.userName);
-      console.log(vm.likedLog.like);
+      console.log(vm.likedList);
     }
   }
 };
