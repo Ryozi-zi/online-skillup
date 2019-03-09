@@ -7,8 +7,10 @@
           <p class="username">{{ chat.username }}</p>
           <p class="postedTime">{{ chat.postedTime }}</p>
           <p class="userpost" v-html="chat.text"></p>
-          <i class="far fa-heart" @click="onLike(chat.id)"><i :class="{ like : chat.isLiked }" class="fas fa-heart inside"></i></i>
-          <span>{{ chat.like }}</span>
+          <div class="like">
+            <i class="far fa-heart" @click="onLike(chat.id)"><i :class="{ liked : chat.isLiked }" class="fas fa-heart inside"></i></i>
+            <span>{{ chat.like }}</span>
+          </div>
         </div>
       </li>
     </transition-group>
@@ -30,14 +32,15 @@ export default {
     onLike(id) {
       this.$emit('onLike', id);
     }
-  },
-  updated() {
-    // v-forがアップデートされた時にメッセージに合わせる
-    const childList = document.getElementById('chats_list').lastChild;
-    if (childList) {
-      childList.scrollIntoView(false);
-    }
   }
+  // いいね機能の追加によって廃止
+  // updated() {
+  //   // v-forがアップデートされた時にメッセージに合わせる
+  //   const childList = document.getElementById('chats_list').lastChild;
+  //   if (childList) {
+  //     childList.scrollIntoView(false);
+  //   }
+  // }
 };
 </script>
 
@@ -63,8 +66,12 @@ i {
   color: #ffb5ee;
 }
 
-.like {
+.liked {
   font-size: 1.4rem;
+}
+
+.like {
+  vertical-align: center;
 }
 
 .post {
@@ -72,6 +79,7 @@ i {
   display: -ms-flex;
   display: flex;
   width: 80%;
+  padding: 5px 0 5px 0;
 }
 
 .postedTime {
