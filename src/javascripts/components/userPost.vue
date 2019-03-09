@@ -7,8 +7,8 @@
           <p class="username">{{ chat.username }}</p>
           <p class="postedTime">{{ chat.postedTime }}</p>
           <p class="userpost" v-html="chat.text"></p>
-          <i class="far fa-heart" @click="onLike(chat.id)"></i>
-          <p>{{ chat.like }}</p>
+          <i class="far fa-heart" @click="onLike(chat.id)"><i :class="{ like : chat.isLiked }" class="fas fa-heart inside"></i></i>
+          <span>{{ chat.like }}</span>
         </div>
       </li>
     </transition-group>
@@ -49,9 +49,9 @@ li {
 
 i {
   color: #ffb5ee;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   position: relative;
-  transition: font-size ease 0.3s;
+  transition: font-size cubic-bezier(0.48, 1.35, 0.6, 1.4) 0.2s;
 }
 
 .inside {
@@ -60,12 +60,11 @@ i {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 0;
-  color: white;
+  color: #ffb5ee;
 }
 
 .like {
-  font-size: 1.8rem;
-  color: #ffb5ee;
+  font-size: 1.4rem;
 }
 
 .post {
