@@ -8,7 +8,7 @@
   <userPost :chatLog="chatLog" id="log" @onLike="onLike"></userPost>
   <form @submit="onSubmit">
     <label for="name">Username</label>
-    <input type="text" name="username" v-model="userName" placeholder="ユーザーネーム" required>
+    <input type="text" name="username" v-model="userName" placeholder="ユーザーネーム">
     <label for="text">Posts</label>
     <textarea v-model="$data.text" name="text" type="text" placeholder="投稿" required @keyup.ctrl.enter="onSubmit"></textarea>
     <button type="submit">送信</button>
@@ -52,13 +52,18 @@ export default {
       const vm = this;
       // サーバーからチャットの配列を受け取って追加
       vm.chatLog.push(...messages);
-      vm.likedList = JSON.parse(localStorage.getItem(key));
       console.log(vm.likedList);
-      vm.likedList.forEach(function(item) {
-        if (vm.chatLog[item.id]) {
-          vm.chatLog[item.id].isLiked = item.isLiked;
-        }
-      });
+      if (localStorage.getItem(key)) {
+        vm.likedList = JSON.parse(localStorage.getItem(key));
+        vm.likedList.forEach(function(item) {
+          if (vm.chatLog[item.id]) {
+            vm.chatLog[item.id].isLiked = item.isLiked;
+          }
+        });
+      } else {
+        vm.likedList = [];
+      }
+      console.log(this.chatLog);
     });
     // 返ってきたメッセージとユーザーネームのobjectを自身のchatLogに代入
     socket.on('send', (object) => {
@@ -86,6 +91,7 @@ export default {
         this.errorMessage = '投稿内容、もしくはユーザーネームを入力してください';
       }
       this.text = '';
+      setTimeout(this.Scroll, 10);
     },
     /**
      *childcomponent userPostでonLikeChildメソッドが呼ばれた時
@@ -93,22 +99,34 @@ export default {
      */
     onLike(logId) {
       const vm = this;
-      vm.likedLog = vm.chatLog[logId];
       let isUpdated = false;
+
+      vm.likedLog = vm.chatLog[logId];
       vm.likedLog.isLiked ? vm.likedLog.like-- : vm.likedLog.like++;
       vm.likedLog.isLiked = !vm.likedLog.isLiked;
-      vm.likedList.forEach(function(item) {
-        if (item.id === logId) {
-          vm.likedList[item.id].isLiked = vm.likedLog.isLiked;
-          isUpdated = true;
-        }
-      });
+
+      if (vm.likedList.length > 0) {
+        vm.likedList.forEach(function(item) {
+          if (item.id === logId) {
+            item.isLiked = vm.likedLog.isLiked;
+            isUpdated = true;
+          }
+        });
+      }
+
       if (isUpdated === false) {
         vm.likedList.push({ id: logId, isLiked: vm.likedLog.isLiked });
       }
-      localStorage.setItem(key, JSON.stringify(this.likedList));
+      localStorage.setItem(key, JSON.stringify(vm.likedList));
       socket.emit('like', this.chatLog[logId], this.userName);
-      console.log(vm.likedLog.like);
+      console.log(vm.likedList);
+    },
+
+    Scroll() {
+      const childList = document.getElementById('chats_list').lastChild;
+      if (childList) {
+        childList.scrollIntoView(false);
+      }
     }
   }
 };
