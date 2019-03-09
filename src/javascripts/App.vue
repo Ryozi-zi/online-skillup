@@ -66,7 +66,6 @@ export default {
       e.preventDefault();
       // textとusernameが空かどうか判定する
       if (this.text && this.$data.userName) {
-        // 送信時に改行のデーターをhtmlの<br>に変換
         this.text = this.text.replace(/\n/g, '<br>');
         socket.emit('send', this.$data.text, this.$data.userName);
         this.errorMessage = '';
@@ -78,8 +77,10 @@ export default {
     },
 
     onLike(id) {
-      this.chatLog[id].like++;
-      console.log(this.chatLog[id].like);
+      const likedLogId = this.chatLog[id];
+      console.log(likedLogId.like);
+      likedLogId.isLiked ? likedLogId.like-- : likedLogId.like++;
+      likedLogId.isLiked = !likedLogId.isLiked;
       socket.emit('like', this.chatLog[id], this.userName);
     }
   }
