@@ -58,7 +58,7 @@ io.on('connection', (socket) => {
     socket.emit('setChatLog', chatLog);
   });
 
-  // likeを更新する
+  // likeを更新する likedLogはlikeされたlogそのもの
   socket.on('like', (likedLog, userName) => {
     socket.broadcast.emit('onLikeSocket', likedLog);
     chatLog[likedLog.id].like = likedLog.like;
@@ -81,7 +81,7 @@ io.on('connection', (socket) => {
       console.log('消してます');
     }
     // メッセージ、ユーザーネームのオブジェクトを返す
-    io.emit('send', { username: userName, text: message, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss'), like: 0 });
+    io.emit('send', { username: userName, text: message, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss'), like: 0, isLiked: false });
     logId++;
   });
 });
