@@ -28,7 +28,7 @@ const key = 'LOCALSTORAGE_LIKED_KEY';
 export default {
   components: {
     MyComponent,
-    userPost,
+    userPost
   },
   data() {
     return {
