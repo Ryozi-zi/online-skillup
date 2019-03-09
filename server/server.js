@@ -74,7 +74,7 @@ io.on('connection', (socket) => {
   socket.on('send', (message, userName) => {
     // 受け取ったメッセージ、ユーザーネームをオブジェクトにしてchatLogにpush
     console.log('send:', message, 'at', moment().format('YYYY/MM/DD HH:mm:ss'));
-    chatLog.push({ username: userName, text: message, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss'), like: 0 });
+    chatLog.push({ username: userName, text: message, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss'), like: 0, isLiked: false });
     // chatLogの長さが500件を超えた際に半分削る
     if (chatLog.length > maxMessage) {
       chatLog.splice(chatLog.length / 2, chatLog.length / 2);
