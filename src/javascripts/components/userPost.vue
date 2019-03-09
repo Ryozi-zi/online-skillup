@@ -52,7 +52,7 @@ li {
 
 i {
   color: #ffb5ee;
-  font-size: 1.4rem;
+  font-size: 2rem;
   position: relative;
   transition: font-size cubic-bezier(0.48, 1.35, 0.6, 1.4) 0.2s;
 }
@@ -67,7 +67,7 @@ i {
 }
 
 .liked {
-  font-size: 1.4rem;
+  font-size: 2rem;
 }
 
 .like {
@@ -78,34 +78,37 @@ i {
   display: -webkit-flex;
   display: -ms-flex;
   display: flex;
-  width: 80%;
+  width: 90%;
   padding: 5px 0 5px 0;
 }
 
 .postedTime {
   display: inline;
-  font-size: 0.8rem;
+  font-size: 1.5rem;
   color: #ccc;
 }
 
 .username {
-  font-size: 0.8rem;
-  color: green;
-  display: inline;
+  font-size: 1.6rem;
+  color: black;
+  display: inline-block;
   margin-right: 15px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .userimage {
   display: -webkit-flex;
   display: -ms-flex;
   display: flex;
-  align-items: center;
+  align-items: top;
   justify-content: center;
   width: 80px;
 }
 
 .userpost {
-  font-weight: 200;
+  font-weight: 100;
+  font-size: 1.5rem;
 }
 
 .post-enter-active, .post-leave-active {

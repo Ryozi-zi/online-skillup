@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-cloak class="container">
   <p>
     <img class="logo" src="../images/logo.jpg" alt="ロゴ">
     <span class="sample">サンプルコード</span>
@@ -133,12 +133,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+div {
+  font-family: '游ゴシック Medium', YuGothic, YuGothicM, 'Hiragino Kaku Gothic ProN', 'Hiragino Kaku Gothic Pro', メイリオ, Meiryo, sans-serif;
+}
+
+[v-cloak] {
+  display: none;
+}
+
 .logo {
   width: 40px;
 }
 
 #log {
-  height: 85vh;
+  height: 75vh;
   width: 80%;
   overflow: auto;
 }
