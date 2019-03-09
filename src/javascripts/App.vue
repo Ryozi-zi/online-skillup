@@ -54,11 +54,15 @@ export default {
       vm.chatLog.push(...messages);
       vm.likedList = JSON.parse(localStorage.getItem(key));
       console.log(vm.likedList);
-      vm.likedList.forEach(function(item) {
-        if (vm.chatLog[item.id]) {
-          vm.chatLog[item.id].isLiked = item.isLiked;
-        }
-      });
+      if (vm.likedList) {
+        vm.likedList.forEach(function(item) {
+          if (vm.chatLog[item.id]) {
+            vm.chatLog[item.id].isLiked = item.isLiked;
+          }
+        });
+      } else {
+        vm.likedList = [];
+      }
     });
     // 返ってきたメッセージとユーザーネームのobjectを自身のchatLogに代入
     socket.on('send', (object) => {
@@ -93,20 +97,25 @@ export default {
      */
     onLike(logId) {
       const vm = this;
-      vm.likedLog = vm.chatLog[logId];
       let isUpdated = false;
+
+      vm.likedLog = vm.chatLog[logId];
       vm.likedLog.isLiked ? vm.likedLog.like-- : vm.likedLog.like++;
       vm.likedLog.isLiked = !vm.likedLog.isLiked;
-      vm.likedList.forEach(function(item) {
-        if (item.id === logId) {
-          vm.likedList[item.id].isLiked = vm.likedLog.isLiked;
-          isUpdated = true;
-        }
-      });
+
+      if (vm.likedList.length > 0) {
+        vm.likedList.forEach(function(item) {
+          if (item.id === logId) {
+            vm.likedList[item.id].isLiked = vm.likedLog.isLiked;
+            isUpdated = true;
+          }
+        });
+      }
+
       if (isUpdated === false) {
         vm.likedList.push({ id: logId, isLiked: vm.likedLog.isLiked });
       }
-      localStorage.setItem(key, JSON.stringify(this.likedList));
+      localStorage.setItem(key, JSON.stringify(vm.likedList));
       socket.emit('like', this.chatLog[logId], this.userName);
       console.log(vm.likedLog.like);
     }

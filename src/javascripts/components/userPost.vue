@@ -7,7 +7,7 @@
           <p class="username">{{ chat.username }}</p>
           <p class="postedTime">{{ chat.postedTime }}</p>
           <p class="userpost" v-html="chat.text"></p>
-          <button @click="onLike(chat.id)">like</button>
+          <i class="far fa-heart" @click="onLike(chat.id)"></i>
           <p>{{ chat.like }}</p>
         </div>
       </li>
@@ -45,6 +45,27 @@ export default {
 li {
   list-style: none;
   border-bottom: 1px solid #eee;
+}
+
+i {
+  color: #ffb5ee;
+  font-size: 1.8rem;
+  position: relative;
+  transition: font-size ease 0.3s;
+}
+
+.inside {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0;
+  color: white;
+}
+
+.like {
+  font-size: 1.8rem;
+  color: #ffb5ee;
 }
 
 .post {
