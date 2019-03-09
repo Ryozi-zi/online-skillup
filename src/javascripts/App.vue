@@ -23,17 +23,21 @@ import socket from './utils/socket';
 import MyComponent from './components/MyComponent.vue';
 import userPost from './components/userPost.vue';
 
+const key = 'LOCALSTORAGE_LIKED_KEY';
+
 export default {
   components: {
     MyComponent,
-    userPost
+    userPost,
   },
   data() {
     return {
       userName: '',
       text: '',
       chatLog: [],
-      errorMessage: ''
+      errorMessage: '',
+      likedList: [],
+      likedlog: []
     };
   },
   created() {
@@ -45,8 +49,16 @@ export default {
     });
 
     socket.on('setChatLog', (messages) => {
+      const vm = this;
       // サーバーからチャットの配列を受け取って追加
-      this.chatLog.push(...messages);
+      vm.chatLog.push(...messages);
+      vm.likedList = JSON.parse(localStorage.getItem(key));
+      console.log(vm.likedList);
+      vm.likedList.forEach(function(item) {
+        if (vm.chatLog[item.id]) {
+          vm.chatLog[item.id].isLiked = item.isLiked;
+        }
+      });
     });
     // 返ってきたメッセージとユーザーネームのobjectを自身のchatLogに代入
     socket.on('send', (object) => {
@@ -75,13 +87,28 @@ export default {
       }
       this.text = '';
     },
-
-    onLike(id) {
-      const likedLogId = this.chatLog[id];
-      console.log(likedLogId.like);
-      likedLogId.isLiked ? likedLogId.like-- : likedLogId.like++;
-      likedLogId.isLiked = !likedLogId.isLiked;
-      socket.emit('like', this.chatLog[id], this.userName);
+    /**
+     *childcomponent userPostでonLikeChildメソッドが呼ばれた時
+     *
+     */
+    onLike(logId) {
+      const vm = this;
+      vm.likedLog = vm.chatLog[logId];
+      let isUpdated = false;
+      vm.likedLog.isLiked ? vm.likedLog.like-- : vm.likedLog.like++;
+      vm.likedLog.isLiked = !vm.likedLog.isLiked;
+      vm.likedList.forEach(function(item) {
+        if (item.id === logId) {
+          vm.likedList[item.id].isLiked = vm.likedLog.isLiked;
+          isUpdated = true;
+        }
+      });
+      if (isUpdated === false) {
+        vm.likedList.push({ id: logId, isLiked: vm.likedLog.isLiked });
+      }
+      localStorage.setItem(key, JSON.stringify(this.likedList));
+      socket.emit('like', this.chatLog[logId], this.userName);
+      console.log(vm.likedLog.like);
     }
   }
 };
