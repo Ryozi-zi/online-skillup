@@ -112,7 +112,7 @@ i {
 }
 
 .post-enter-active, .post-leave-active {
-  transition: opacity 0.3s, transform 0.3s cubic-bezier(0.55, 0.73, 0.69, 1.25);
+  transition: opacity 0.3s, transform 0.3s cubic-bezier(0.56, 1.93, 0.78, 1.93);
 }
 
 .post-enter, .post-leave-to {
