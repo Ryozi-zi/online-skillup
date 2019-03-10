@@ -30,12 +30,14 @@ app.get('/time', (req, res) => {
 
 // メッセージとユーザーネームをオブジェクトとして格納する配列chatLog
 const chatLog = [];
+const rooms = [];
 
 // ログに入れる最大メッセージ数
 const maxMessage = 500;
 
 // ログのid
 let logId = 0;
+let roomId = 0;
 
 // サーバーを起動する
 const server = app.listen(process.env.PORT || 4000, '0.0.0.0', () => {
@@ -58,6 +60,18 @@ io.on('connection', (socket) => {
     socket.emit('setChatLog', chatLog);
   });
 
+  // Room作成
+  socket.on('createRoom', (name, description) => {
+    rooms.push({ id: roomId, room_name: name, room_description: description });
+    console.log(rooms[roomId].id + ' ' + roomId + ' ' + rooms[roomId].room_name + ' ' + rooms[roomId].room_description);
+    roomId++;
+  });
+
+  // All room 情報を獲得
+  socket.on('getRoomList', function() {
+    socket.emit('setRoomList', rooms);
+  });
+
   // likeを更新する likedLogはlikeされたlogそのもの
   socket.on('like', (likedLog, userName) => {
     socket.broadcast.emit('onLikeSocket', likedLog);
@@ -65,23 +79,26 @@ io.on('connection', (socket) => {
     console.log(userName + ' liked ' + likedLog.text);
   });
 
-  // 切断時
-  socket.on('disconnect', () => {
-    console.log('disconnected:', socket.id);
-  });
-
   // ユーザの参加
-  socket.on('send', (message, userName) => {
+  socket.on('send', (message, userName, room) => {
     // 受け取ったメッセージ、ユーザーネームをオブジェクトにしてchatLogにpush
     console.log('send:', message, 'at', moment().format('YYYY/MM/DD HH:mm:ss'));
-    chatLog.push({ username: userName, text: message, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss'), like: 0, isLiked: false });
+    const newLog = { username: userName, text: message, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss'), like: 0, isLiked: false, roomID: room.id };
+
+    chatLog.push(newLog);
+    console.log(room.id);
     // chatLogの長さが500件を超えた際に半分削る
     if (chatLog.length > maxMessage) {
       chatLog.splice(chatLog.length / 2, chatLog.length / 2);
       console.log('消してます');
     }
     // メッセージ、ユーザーネームのオブジェクトを返す
-    io.emit('send', { username: userName, text: message, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss'), like: 0, isLiked: false });
+    io.emit('send', newLog);
     logId++;
+  });
+
+  // 切断時
+  socket.on('disconnect', () => {
+    console.log('disconnected:', socket.id);
   });
 });

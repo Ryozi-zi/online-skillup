@@ -1,13 +1,14 @@
 <template>
 <div v-cloak class="container">
+  <h1>{{ $route.params.room_name }}</h1>
   <p style="color: red;" v-if="errorMessage">{{ errorMessage }}</p>
-  <user-post :chatLog="chatLog" id="log" @onLike="onLike"></user-post>
-  <form @submit="onSubmit" class="row">
-    <label for="name">Username</label>
+  <user-post :chatLog="chatLog" :roomID="$route.params.id" id="log" @onLike="onLike"></user-post>
+  <form @submit="onSubmit">
+    <label for="username">Username</label>
     <input type="text" name="username" v-model="userName" placeholder="ユーザーネーム">
     <label for="text">Posts</label>
     <textarea v-model="$data.text" name="text" type="text" placeholder="投稿" required @keyup.ctrl.enter="onSubmit"></textarea>
-    <button type="submit">送信</button>
+    <button>Send</button>
   </form>
 </div>
 </template>
@@ -58,7 +59,6 @@ export default {
         const vm = this;
         // サーバーからチャットの配列を受け取って追加
         vm.chatLog.push(...messages);
-        console.log(vm.likedList);
         // localStorageにlikedlistの情報が残っているならそれを格納する
         if (localStorage.getItem(key)) {
           vm.likedList = JSON.parse(localStorage.getItem(key));
@@ -75,7 +75,6 @@ export default {
     onSend() {
       // 返ってきたメッセージとユーザーネームのobjectを自身のchatLogに代入
       socket.on('send', (object) => {
-        console.log(object);
         this.chatLog.push(object);
       });
     },
@@ -94,7 +93,7 @@ export default {
       // textとusernameが空かどうか判定する
       if (this.text && this.$data.userName) {
         this.text = this.text.replace(/\n/g, '<br>');
-        socket.emit('send', this.$data.text, this.$data.userName);
+        socket.emit('send', this.$data.text, this.$data.userName, this.$route.params);
         this.errorMessage = '';
       } else {
         // messageが空欄だった場合にエラーメッセージを表示
@@ -110,6 +109,7 @@ export default {
     onLike(logId) {
       const vm = this;
       let isUpdated = false;
+      console.log(vm.chatLog);
 
       vm.likedLog = vm.chatLog[logId];
       vm.likedLog.isLiked ? vm.likedLog.like-- : vm.likedLog.like++;
@@ -152,18 +152,10 @@ div {
   display: none;
 }
 
-.logo {
-  width: 40px;
-}
-
 #log {
   height: 75vh;
   width: 80%;
   overflow: auto;
-}
-
-.sample {
-  color: $red;
 }
 
 // form {

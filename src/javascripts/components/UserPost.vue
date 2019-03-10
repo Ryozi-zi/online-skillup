@@ -1,7 +1,7 @@
 <template lang="html">
   <ul id="chats">
     <transition-group name="post" id="chats_list">
-      <li v-for="chat in chatLog" :key="chat.id" class="post">
+      <li v-for="chat in chatLog" :key="chat.id" class="post" v-if="chat.roomID === roomID">
         <div v-html="identicon(chat.username)" class="userimage"></div>
         <div class="texts">
           <p class="username">{{ chat.username }}</p>
@@ -22,7 +22,8 @@ const jdenticon = require('jdenticon');
 
 export default {
   props: {
-    chatLog: Array
+    chatLog: Array,
+    roomID: Number
   },
   methods: {
     identicon: (username) => {
