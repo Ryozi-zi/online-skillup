@@ -1,8 +1,9 @@
 <template>
   <div>
     <router-link to="/">Home</router-link>
+    <router-link to="/login">Login</router-link>
     <router-link to="/rooms">Rooms</router-link>
-    <router-link to="/chat">Go to chat</router-link>
+    <router-link to="/createroom">Create a room</router-link>
     <router-view></router-view>
   </div>
 </template>

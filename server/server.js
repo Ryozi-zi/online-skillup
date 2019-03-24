@@ -4,6 +4,20 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+// firebaseの初期設定
+const firebase = require('firebase');
+
+const config = {
+  apiKey: 'AIzaSyAMfp_hyzVnlkBaM_djrdfLWDr0mu043K8',
+  authDomain: 'online-skillup-ryoji-d1e3f.firebaseapp.com',
+  databaseURL: 'https://online-skillup-ryoji-d1e3f.firebaseio.com',
+  projectId: 'online-skillup-ryoji-d1e3f',
+  storageBucket: 'online-skillup-ryoji-d1e3f.appspot.com',
+  messagingSenderId: '1006405441107'
+};
+
+firebase.initializeApp(config);
+
 // タイムゾーンを設定する
 const moment = require('moment');
 require('moment-timezone');
@@ -32,12 +46,15 @@ app.get('/time', (req, res) => {
 const chatLog = [];
 const rooms = [];
 
+const database = firebase.database();
+
 // ログに入れる最大メッセージ数
 const maxMessage = 500;
 
-// ログのid
+// id系
 let logId = 0;
 let roomId = 0;
+let userId = 0;
 
 // サーバーを起動する
 const server = app.listen(process.env.PORT || 4000, '0.0.0.0', () => {
@@ -54,6 +71,29 @@ const io = require('socket.io')(server, {
 // socketイベントの設定
 io.on('connection', (socket) => {
   console.log('connected:', socket.id);
+
+  socket.on('signUp', (userName, password) => {
+    database.ref('users/' + userId).set({
+      userId: userId,
+      username: userName,
+      password: password
+    }, function(error) {
+      if (!error) {
+        userId++;
+      }
+    });
+  });
+
+  socket.on('login', (userName, password) => {
+    database.ref('/users').orderByChild('username').startAt(userName).endAt(userName).on('value', function(snapshot) {
+      if (password === snapshot.val()[0].password) {
+        socket.emit('loginSucceed', userName);
+      } else {
+        socket.emit('loginfailed');
+      }
+      console.log(snapshot.val()[0].password);
+    });
+  });
 
   // chatLogを送信する
   socket.on('getChatLog', function() {
@@ -86,6 +126,7 @@ io.on('connection', (socket) => {
     const newLog = { username: userName, text: message, id: logId, postedTime: moment().format('YYYY/MM/DD HH:mm:ss'), like: 0, isLiked: false, roomID: room.id };
 
     chatLog.push(newLog);
+
     console.log(room.id);
     // chatLogの長さが500件を超えた際に半分削る
     if (chatLog.length > maxMessage) {

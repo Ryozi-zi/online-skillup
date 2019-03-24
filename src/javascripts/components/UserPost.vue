@@ -34,14 +34,6 @@ export default {
       this.$emit('onLike', id);
     }
   }
-  // いいね機能の追加によって廃止
-  // updated() {
-  //   // v-forがアップデートされた時にメッセージに合わせる
-  //   const childList = document.getElementById('chats_list').lastChild;
-  //   if (childList) {
-  //     childList.scrollIntoView(false);
-  //   }
-  // }
 };
 </script>
 
