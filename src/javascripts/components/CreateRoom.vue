@@ -29,6 +29,7 @@ export default {
     onSubmit(e) {
       e.preventDefault();
       socket.emit('createRoom', this.$data.roomName, this.$data.roomDescription);
+      this.$router.push('/rooms');
     }
   }
 };
