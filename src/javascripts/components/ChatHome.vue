@@ -1,14 +1,12 @@
 <template>
 <div v-cloak class="container">
   <h1>{{ $route.params.room_name }}</h1>
+  <p>{{ $route.params.room_description}}</p>
   <p style="color: red;" v-if="errorMessage">{{ errorMessage }}</p>
   <user-post :chatLog="chatLog" :roomID="$route.params.id" id="log" @onLike="onLike"></user-post>
-  <form @submit="onSubmit">
-    <label for="username">Username</label>
-    <input type="text" name="username" v-model="userName" placeholder="ユーザーネーム">
-    <label for="text">Posts</label>
-    <textarea v-model="$data.text" name="text" type="text" placeholder="投稿" required @keyup.ctrl.enter="onSubmit"></textarea>
-    <button>Send</button>
+  <form @submit="onSubmit" class="ui input field posting">
+    <textarea v-model="$data.text" name="text" type="text" placeholder="メッセージを入力" rows="1" required @keyup.ctrl.enter="onSubmit"></textarea>
+    <button class="ui button">Send</button>
   </form>
 </div>
 </template>
@@ -18,6 +16,7 @@ import socket from '../utils/socket';
 
 // components
 import UserPost from './UserPost.vue';
+import { mapGetters } from 'vuex';
 
 const key = 'LOCALSTORAGE_LIKED_KEY';
 
@@ -27,7 +26,6 @@ export default {
   },
   data() {
     return {
-      userName: '',
       text: '',
       chatLog: [],
       errorMessage: '',
@@ -91,9 +89,9 @@ export default {
     onSubmit(e) {
       e.preventDefault();
       // textとusernameが空かどうか判定する
-      if (this.text && this.$data.userName) {
+      if (this.text && this.userName) {
         this.text = this.text.replace(/\n/g, '<br>');
-        socket.emit('send', this.$data.text, this.$data.userName, this.$route.params);
+        socket.emit('send', this.$data.text, this.userName, this.$route.params);
         this.errorMessage = '';
       } else {
         // messageが空欄だった場合にエラーメッセージを表示
@@ -138,6 +136,9 @@ export default {
         childList.scrollIntoView(false);
       }
     }
+  },
+  computed: {
+    ...mapGetters(['userName'])
   }
 };
 </script>
@@ -154,13 +155,13 @@ div {
 
 #log {
   height: 75vh;
-  width: 80%;
   overflow: auto;
 }
 
-// form {
-//   position: fixed;
-//   bottom: 0;
-//   left: 0;
-// }
+.posting {
+  position: absolute;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
 </style>

@@ -1,11 +1,16 @@
 <template>
   <div>
-    <form @submit="onSubmit">
-      <label for="roomName">Room name</label>
-      <input type="text" name="roomName" v-model="roomName" required>
-      <label for="roomDescription">Description for the room</label>
-      <input type="text" name="roomDescription" v-model="roomDescription" required>
-      <button>Create Room</button>
+    <h2 class="ui dividing header">Create a new room</h2>
+    <form @submit="onSubmit" class="ui fluid form">
+      <div class="field">
+        <label for="roomName">Room name</label>
+        <input type="text" name="roomName" v-model="roomName" required>
+      </div>
+      <div class="field">
+        <label for="roomDescription">Description for the room</label>
+        <input type="text" name="roomDescription" v-model="roomDescription" required>
+      </div>
+      <button class="ui button">Create Room</button>
     </form>
   </div>
 </template>

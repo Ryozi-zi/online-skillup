@@ -17,6 +17,7 @@ const config = {
 };
 
 firebase.initializeApp(config);
+const database = firebase.database();
 
 // タイムゾーンを設定する
 const moment = require('moment');
@@ -46,15 +47,12 @@ app.get('/time', (req, res) => {
 const chatLog = [];
 const rooms = [];
 
-const database = firebase.database();
-
 // ログに入れる最大メッセージ数
 const maxMessage = 500;
 
 // id系
 let logId = 0;
 let roomId = 0;
-let userId = 0;
 
 // サーバーを起動する
 const server = app.listen(process.env.PORT || 4000, '0.0.0.0', () => {
@@ -73,25 +71,34 @@ io.on('connection', (socket) => {
   console.log('connected:', socket.id);
 
   socket.on('signUp', (userName, password) => {
-    database.ref('users/' + userId).set({
-      userId: userId,
-      username: userName,
-      password: password
-    }, function(error) {
-      if (!error) {
-        userId++;
+    database.ref('/users/' + userName).on('value', function(snapshot) {
+      if (snapshot.val()) {
+        console.log(snapshot.val());
+        socket.emit('signUpFailed');
+      } else {
+        database.ref('users/' + userName).set({
+          username: userName,
+          password: password
+        });
+        socket.emit('signUpSucceed');
       }
     });
   });
 
-  socket.on('login', (userName, password) => {
-    database.ref('/users').orderByChild('username').startAt(userName).endAt(userName).on('value', function(snapshot) {
-      if (password === snapshot.val()[0].password) {
-        socket.emit('loginSucceed', userName);
+  socket.on('login', (userName, pass) => {
+    database.ref('/users/' + userName).on('value', function(snapshot) {
+      console.log(snapshot.val());
+      if (snapshot.val()) {
+        if (pass === snapshot.val().password) {
+          socket.emit('loginSucceed', userName);
+        } else {
+          console.log('Password is wrong');
+          socket.emit('loginFailed');
+        }
       } else {
-        socket.emit('loginfailed');
+        console.log('Username is wrong');
+        socket.emit('loginFailed');
       }
-      console.log(snapshot.val()[0].password);
     });
   });
 
