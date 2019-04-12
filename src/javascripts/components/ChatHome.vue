@@ -5,7 +5,7 @@
   <p style="color: red;" v-if="errorMessage">{{ errorMessage }}</p>
   <user-post :chatLog="chatLog" :roomID="$route.params.id" id="log" @onLike="onLike"></user-post>
   <form @submit="onSubmit" class="ui input field posting">
-    <textarea v-model="$data.text" name="text" type="text" placeholder="メッセージを入力" rows="1" required @keyup.ctrl.enter="onSubmit"></textarea>
+    <textarea v-model="$data.text" name="text" type="text" placeholder="メッセージを入力" rows="1" required @keyup.ctrl.enter="onSubmit" style="border-radius: 0.28571429rem; margin-right: 0.1em;"></textarea>
     <button class="ui button">Send</button>
   </form>
 </div>
@@ -43,7 +43,6 @@ export default {
   methods: {
     onConnect() {
       socket.emit('getChatLog', () => {});
-      console.log('getting chat log');
     },
 
     onSetChatLog() {
@@ -60,7 +59,6 @@ export default {
             }
           });
         }
-        console.log(this.chatLog);
       });
     },
 
@@ -88,6 +86,7 @@ export default {
         this.errorMessage = '投稿内容を入力してください';
         return;
       }
+
       this.text = this.text.replace(/\n/g, '<br>');
       socket.emit('send', this.$data.text, this.userName, this.$route.params);
       this.errorMessage = '';
@@ -101,7 +100,6 @@ export default {
     onLike(logId) {
       const vm = this;
       let isUpdated = false;
-      console.log(vm.chatLog);
 
       vm.likedLog = vm.chatLog[logId];
       vm.likedLog.isLiked ? vm.likedLog.like-- : vm.likedLog.like++;
@@ -121,7 +119,6 @@ export default {
       }
       localStorage.setItem(key, JSON.stringify(vm.likedList));
       socket.emit('like', this.chatLog[logId], this.userName);
-      console.log(vm.likedList);
     },
 
     Scroll() {

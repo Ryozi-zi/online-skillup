@@ -1,7 +1,8 @@
 <template>
   <div>
     <div>
-      <h2 class="ui dividing header">Sign up</h2>
+      <h2 class="ui dividing">手軽にチャットできる簡単Webアプリです。</h2>
+      <h2 class="ui divider header" style="margin: 1em 0 2em 0;">Sign up</h2>
       <form @submit="onSubmit" class="ui fluid form">
         <div class="field">
           <label for="username">ユーザーネーム</label>
