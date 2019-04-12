@@ -1,109 +1,62 @@
 <template>
-<div>
-  <p>
-    <img class="logo" src="../images/logo.jpg" alt="ロゴ">
-    <span class="sample">サンプルコード</span>
-  </p>
-  <p style="color: red;" v-if="errorMessage">{{ errorMessage }}</p>
-  <userPost :chatLog="chatLog" id="log" @onLike="onLike"></userPost>
-  <form @submit="onSubmit">
-    <label for="name">Username</label>
-    <input type="text" name="username" v-model="userName" placeholder="ユーザーネーム" required>
-    <label for="text">Posts</label>
-    <textarea v-model="$data.text" name="text" type="text" placeholder="投稿" required @keyup.ctrl.enter="onSubmit"></textarea>
-    <button type="submit">送信</button>
-  </form>
-</div>
+  <body>
+    <div class="ui fixed inverted menu">
+      <div class="ui container">
+        <router-link to="/" class="header item">Home</router-link>
+        <router-link to="/login" v-if="!isLoggedIn" class="item">Login</router-link>
+        <router-link to="/rooms" v-if="isLoggedIn" class="item">Rooms</router-link>
+        <router-link to="/createroom" v-if="isLoggedIn" class="item">Create a room</router-link>
+        <a @click="logout" v-if="isLoggedIn" class="item">Logout</a>
+        <div v-if="userName" class="right menu">
+          <div class="item">{{ userName }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="ui main text container">
+      <router-view></router-view>
+    </div>
+  </body>
 </template>
 
 <script>
-import socket from './utils/socket';
-
-// components
-import MyComponent from './components/MyComponent.vue';
-import userPost from './components/userPost.vue';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
-  components: {
-    MyComponent,
-    userPost
-  },
   data() {
     return {
-      userName: '',
-      text: '',
-      chatLog: [],
-      errorMessage: ''
+      message: 'this is app vue'
     };
   },
-  created() {
-    socket.on('connect', () => {
-      console.log('connected!');
-      // チャットログを受け取るためにcreatedでgetChatLogを送信
-      socket.emit('getChatLog', () => {});
-      console.log('getting chat log');
-    });
-
-    socket.on('setChatLog', (messages) => {
-      // サーバーからチャットの配列を受け取って追加
-      this.chatLog.push(...messages);
-    });
-    // 返ってきたメッセージとユーザーネームのobjectを自身のchatLogに代入
-    socket.on('send', (object) => {
-      console.log(object);
-      this.chatLog.push(object);
-    });
-
-    socket.on('onLikeSocket', (likedLog) => {
-      this.chatLog[likedLog.id].like = likedLog.like;
-    });
-  },
   methods: {
-    /**
-     * Enterボタンを押したとき
-     */
-    onSubmit(e) {
-      e.preventDefault();
-      // textとusernameが空かどうか判定する
-      if (this.text && this.$data.userName) {
-        // 送信時に改行のデーターをhtmlの<br>に変換
-        this.text = this.text.replace(/\n/g, '<br>');
-        socket.emit('send', this.$data.text, this.$data.userName);
-        this.errorMessage = '';
-      } else {
-        // messageが空欄だった場合にエラーメッセージを表示
-        this.errorMessage = '投稿内容、もしくはユーザーネームを入力してください';
-      }
-      this.text = '';
-    },
+    ...mapActions(['logout']),
 
-    onLike(id) {
-      this.chatLog[id].like++;
-      console.log(this.chatLog[id].like);
-      socket.emit('like', this.chatLog[id], this.userName);
+    redirectHome() {
+      this.$router.push('/');
+    }
+  },
+  created() {
+    console.log('created!');
+    if (!this.isLoggedIn) {
+      this.redirectHome();
+    }
+  },
+  computed: mapGetters(['userName', 'isLoggedIn']),
+  watch: {
+    isLoggedIn: function() {
+      if (!this.isLoggedIn) {
+        this.redirectHome();
+      }
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.logo {
-  width: 40px;
+div {
+  display: block;
 }
 
-#log {
-  height: 85vh;
-  width: 80%;
-  overflow: auto;
-}
-
-.sample {
-  color: $red;
-}
-
-form {
-  position: fixed;
-  bottom: 0;
-  left: 0;
+.main.container {
+  margin-top: 3.75em;
 }
 </style>
