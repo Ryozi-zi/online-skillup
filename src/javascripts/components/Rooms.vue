@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <h2>Room List</h2>
-    <div class="ui link cards">
+    <h3 v-if="roomList.length < 1">Let's make a new room!</h3>
+    <div v-else class="ui link cards">
       <div v-for="room in roomList" class="ui card">
         <router-link :to="{ name: 'Chat', params: room }" class="content">
           <h3 class="header black">{{ room.room_name }}</h3>
