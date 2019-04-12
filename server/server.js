@@ -112,6 +112,7 @@ io.on('connection', (socket) => {
     rooms.push({ id: roomId, room_name: name, room_description: description });
     console.log(rooms[roomId].id + ' ' + roomId + ' ' + rooms[roomId].room_name + ' ' + rooms[roomId].room_description);
     roomId++;
+    socket.emit('setRoomList', rooms);
   });
 
   // All room 情報を獲得
