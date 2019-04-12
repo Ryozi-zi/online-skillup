@@ -53,9 +53,9 @@ export default {
     passwordAgain: function() {
       if (this.password !== this.passwordAgain) {
         this.errorMessage = 'パスワードが一致しません';
-      } else {
-        this.errorMessage = '';
+        return;
       }
+      this.errorMessage = '';
     }
   }
 };

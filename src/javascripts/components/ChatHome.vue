@@ -88,15 +88,15 @@ export default {
      */
     onSubmit(e) {
       e.preventDefault();
-      // textとusernameが空かどうか判定する
-      if (this.text && this.userName) {
-        this.text = this.text.replace(/\n/g, '<br>');
-        socket.emit('send', this.$data.text, this.userName, this.$route.params);
-        this.errorMessage = '';
-      } else {
-        // messageが空欄だった場合にエラーメッセージを表示
-        this.errorMessage = '投稿内容、もしくはユーザーネームを入力してください';
+      // textが空かどうか判定する
+      this.text = this.text.trim();
+      if (!this.text) {
+        this.errorMessage = '投稿内容を入力してください';
+        return;
       }
+      this.text = this.text.replace(/\n/g, '<br>');
+      socket.emit('send', this.$data.text, this.userName, this.$route.params);
+      this.errorMessage = '';
       this.text = '';
       setTimeout(this.Scroll, 10);
     },
