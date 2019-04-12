@@ -12,7 +12,7 @@
           <label for="password">パスワード</label>
           <input type="password" name="password" v-model="password" required>
         </div>
-        <button class="ui button">Submit</button>
+        <button class="ui secondary button" :disabled="!(userName && password)">Submit</button>
       </form>
     </div>
   </div>

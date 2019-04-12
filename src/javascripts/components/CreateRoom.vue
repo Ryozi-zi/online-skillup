@@ -10,7 +10,7 @@
         <label for="roomDescription">Description for the room</label>
         <input type="text" name="roomDescription" v-model="roomDescription" required>
       </div>
-      <button class="ui button">Create Room</button>
+      <button class="ui secondary button" :disabled="!(roomName && roomDescription)">Create Room</button>
     </form>
   </div>
 </template>

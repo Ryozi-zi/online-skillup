@@ -16,7 +16,7 @@
           <input type="password" name="passwordAgain" v-model="passwordAgain" required>
           <div class="ui pointing red label" v-if="errorMessage">{{ errorMessage }}</div>
         </div>
-        <button class="ui secondary button" v-if="!errorMessage">Submit</button>
+        <button class="ui secondary button" v-if="!errorMessage" :disabled="!(userName && password && passwordAgain)">Submit</button>
       </form>
     </div>
   </div>
