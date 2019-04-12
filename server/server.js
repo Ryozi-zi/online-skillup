@@ -45,7 +45,7 @@ app.get('/time', (req, res) => {
 
 // メッセージとユーザーネームをオブジェクトとして格納する配列chatLog
 const chatLog = [];
-const rooms = [];
+let rooms = [];
 
 // ログに入れる最大メッセージ数
 const maxMessage = 500;
@@ -109,13 +109,19 @@ io.on('connection', (socket) => {
 
   // Room作成
   socket.on('createRoom', (name, description) => {
-    rooms.push({ id: roomId, room_name: name, room_description: description });
-    console.log(rooms[roomId].id + ' ' + roomId + ' ' + rooms[roomId].room_name + ' ' + rooms[roomId].room_description);
+    database.ref('/rooms/' + roomId).set({
+      id: roomId,
+      room_name: name,
+      room_description: description
+    });
     roomId++;
   });
 
   // All room 情報を獲得
   socket.on('getRoomList', function() {
+    database.ref('/rooms').on('value', function(snapshot) {
+      rooms = snapshot.val();
+    });
     socket.emit('setRoomList', rooms);
   });
 

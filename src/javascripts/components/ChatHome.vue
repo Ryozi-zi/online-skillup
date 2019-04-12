@@ -44,12 +44,6 @@ export default {
     onConnect() {
       socket.emit('getChatLog', () => {});
       console.log('getting chat log');
-      // socket.on('connect', () => {
-      //   console.log('connected!');
-      //   // チャットログを受け取るためにcreatedでgetChatLogを送信
-      //   socket.emit('getChatLog', () => {});
-      //   console.log('getting chat log');
-      // });
     },
 
     onSetChatLog() {
